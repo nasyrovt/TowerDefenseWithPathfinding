@@ -31,9 +31,10 @@ public class Tile : MonoBehaviour
 
     //Property example (cleaner that get;set)
     public bool IsPlaceable { get { return isPlaceable; } }
+
     void OnMouseDown()
     {
-        if (gridManager.GetNode(coordinates).isWalkable && pathFinder.WillBlockPath(coordinates))
+        if (gridManager.GetNode(coordinates).isWalkable && !pathFinder.WillBlockPath(coordinates))
         {
             bool isPlaced = tower.CreateTower(tower, transform.position);
             isPlaceable = !isPlaced;
