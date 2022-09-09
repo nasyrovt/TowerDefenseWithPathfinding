@@ -29,22 +29,24 @@ public class PathFinder : MonoBehaviour
             grid = gridManager.Grid;
             startNode = gridManager.Grid[startCoordinates];
             destinationNode = gridManager.Grid[destinationCoordinates];
-
         }
-
     }
 
     void Start()
     {
-        BreadthFirstSearch();
-        BuildPath();
+        GetNewPath();
+    }
+
+    public List<Node> GetNewPath(Vector2Int coordinates)
+    {
+        gridManager.ResetNodes();
+        BreadthFirstSearch(coordinates);
+        return BuildPath();
     }
 
     public List<Node> GetNewPath()
     {
-        gridManager.ResetNodes();
-        BreadthFirstSearch();
-        return BuildPath();
+        return GetNewPath(startCoordinates);
     }
 
     void ExploreNeighbors()
@@ -68,7 +70,7 @@ public class PathFinder : MonoBehaviour
         }
     }
 
-    void BreadthFirstSearch()
+    void BreadthFirstSearch(Vector2Int coordinates)
     {
         startNode.isWalkable = true;
         destinationNode.isWalkable = true;
@@ -78,8 +80,8 @@ public class PathFinder : MonoBehaviour
 
         bool isRunning = true;
 
-        frontier.Enqueue(startNode);
-        reached.Add(startCoordinates, startNode);
+        frontier.Enqueue(grid[coordinates]);
+        reached.Add(coordinates, grid[coordinates]);
 
         while (frontier.Count > 0 && isRunning)
         {
@@ -116,7 +118,7 @@ public class PathFinder : MonoBehaviour
     {
         if (grid.ContainsKey(coordinates))
         {
-            bool previousState = !grid[coordinates].isWalkable;
+            bool previousState = grid[coordinates].isWalkable;
             grid[coordinates].isWalkable = false;
             List<Node> newPath = GetNewPath();
             grid[coordinates].isWalkable = previousState;
@@ -129,5 +131,10 @@ public class PathFinder : MonoBehaviour
         }
 
         return false;
+    }
+
+    public void NotifyReceivers()
+    {
+        BroadcastMessage("RecalculatePath", false, SendMessageOptions.DontRequireReceiver);
     }
 }
